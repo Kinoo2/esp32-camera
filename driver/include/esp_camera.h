@@ -85,7 +85,7 @@ typedef enum {
 } camera_grab_mode_t;
 
 /**
- * @brief Camera frame buffer location 
+ * @brief Camera frame buffer location
  */
 typedef enum {
     CAMERA_FB_IN_PSRAM,         /*!< Frame buffer is placed in external PSRAM */
@@ -99,7 +99,7 @@ typedef enum {
 typedef enum {
     CONV_DISABLE,
     RGB565_TO_YUV422,
-        
+
     YUV422_TO_RGB565,
     YUV422_TO_YUV420
 } camera_conv_mode_t;
@@ -149,6 +149,10 @@ typedef struct {
 #endif
 
     int sccb_i2c_port;              /*!< If pin_sccb_sda is -1, use the already configured I2C bus by number */
+    // Callback to apply resolution parameters such as offset or FoV
+    int (*apply_res_params)(void* instance);
+    // Instance of KcCamera class to be passed to apply_res_params
+    void* apply_res_params_instance;
 } camera_config_t;
 
 /**
@@ -161,6 +165,9 @@ typedef struct {
     size_t height;              /*!< Height of the buffer in pixels */
     pixformat_t format;         /*!< Format of the pixel data */
     struct timeval timestamp;   /*!< Timestamp since boot of the first DMA buffer of the frame */
+    int previous_fov;
+    int fov;
+    unsigned long frame_num;
 } camera_fb_t;
 
 #define ESP_ERR_CAMERA_BASE 0x20000
@@ -219,15 +226,15 @@ sensor_t * esp_camera_sensor_get();
 
 /**
  * @brief Save camera settings to non-volatile-storage (NVS)
- * 
- * @param key   A unique nvs key name for the camera settings 
+ *
+ * @param key   A unique nvs key name for the camera settings
  */
 esp_err_t esp_camera_save_to_nvs(const char *key);
 
 /**
  * @brief Load camera settings from non-volatile-storage (NVS)
- * 
- * @param key   A unique nvs key name for the camera settings 
+ *
+ * @param key   A unique nvs key name for the camera settings
  */
 esp_err_t esp_camera_load_from_nvs(const char *key);
 
