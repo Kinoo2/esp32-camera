@@ -205,7 +205,7 @@ static void IRAM_ATTR ll_cam_vsync_isr(void *arg)
     cam_obj_t *cam = (cam_obj_t *)arg;
     BaseType_t HPTaskAwoken = pdFALSE;
     // filter
-    ets_delay_us(1);
+    esp_rom_delay_us(1);
     if (gpio_ll_get_level(&GPIO, cam->vsync_pin) == !cam->vsync_invert) {
         ll_cam_send_event(cam, CAM_VSYNC_EVENT, &HPTaskAwoken);
         if (HPTaskAwoken == pdTRUE) {
