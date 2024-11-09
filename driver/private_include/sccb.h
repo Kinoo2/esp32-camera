@@ -8,9 +8,14 @@
  */
 #ifndef __SCCB_H__
 #define __SCCB_H__
+#include "driver/i2c_master.h"
+#include "driver/i2c_types.h"
+
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
 #include <stdint.h>
 int SCCB_Init(int pin_sda, int pin_scl);
-int SCCB_Use_Port(int sccb_i2c_port);
+int SCCB_Use_Port(i2c_master_bus_handle_t i2c_bus, SemaphoreHandle_t lock);
 int SCCB_Deinit(void);
 uint8_t SCCB_Probe(void);
 uint8_t SCCB_Read(uint8_t slv_addr, uint8_t reg);

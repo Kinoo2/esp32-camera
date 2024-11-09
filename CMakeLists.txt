@@ -84,7 +84,7 @@ if(IDF_TARGET STREQUAL "esp32" OR IDF_TARGET STREQUAL "esp32s2" OR IDF_TARGET ST
   # include the SCCB I2C driver
   # this uses either the legacy I2C API or the newwer version from IDF v5.4
   # as this features a method to obtain the I2C driver from a port number
-  if (idf_version VERSION_GREATER_EQUAL "5.4")
+  if(idf_version VERSION_GREATER_EQUAL "5.2")
     list(APPEND srcs driver/sccb-ng.c)
   else()
     list(APPEND srcs driver/sccb.c)
