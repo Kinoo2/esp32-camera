@@ -42,14 +42,13 @@
 static const char *TAG = "cam_hal";
 static cam_obj_t *cam_obj = NULL;
 
-static const uint32_t JPEG_SOI_MARKER = 0xFFD8FF;  // written in little-endian for esp32
-static const uint16_t JPEG_EOI_MARKER = 0xD9FF;  // written in little-endian for esp32
+static const uint32_t JPEG_SOI_MARKER = 0xD8FF; // written in little-endian for esp32
+static const uint16_t JPEG_EOI_MARKER = 0xD9FF; // written in little-endian for esp32
 
-static int cam_verify_jpeg_soi(const uint8_t *inbuf, uint32_t length)
-{
-    for (uint32_t i = 0; i < length; i++) {
-        if (memcmp(&inbuf[i], &JPEG_SOI_MARKER, 3) == 0) {
-            //ESP_LOGW(TAG, "SOI: %d", (int) i);
+static int cam_verify_jpeg_soi(const uint8_t* inbuf, uint32_t length) {
+    for (uint32_t i = 0; i < length - 1; i++) {
+        if (memcmp(&inbuf[i], &JPEG_SOI_MARKER, 2) == 0) {
+            // ESP_LOGW(TAG, "SOI: %d", (int)i);
             return i;
         }
     }
