@@ -23,7 +23,6 @@ static const char *TAG = "sccb-ng";
 
 #define LITTLETOBIG(x) ((x << 8) | (x >> 8))
 
-// #include "esp_private/i2c_platform.h"
 #include "driver/i2c_master.h"
 #include "driver/i2c_types.h"
 
@@ -47,8 +46,8 @@ const int SCCB_I2C_PORT_DEFAULT = 0;
 
 /*
  The legacy I2C driver used addresses to differentiate between devices, whereas the new driver uses
- i2c_master_dev_handle_t structs which are registed to the bus.
- To avoid re-writing all camera dependant code, we simply translate the devices address to the corresponding
+ i2c_master_dev_handle_t structs which are registered to the bus.
+ To avoid re-writing all camera dependent code, we simply translate the devices address to the corresponding
  device_handle. This keeps all interfaces to the drivers identical.
  To perform this conversion the following local struct is used.
 */
@@ -84,7 +83,7 @@ int SCCB_Install_Device(uint8_t slv_addr)
 {
   esp_err_t ret;
 
-  if (device_count > MAX_DEVICES) {
+  if (device_count >= MAX_DEVICES) {
     ESP_LOGE(TAG, "cannot add more than %d devices", MAX_DEVICES);
     return ESP_FAIL;
   }
@@ -150,6 +149,7 @@ int SCCB_Use_Port(i2c_master_bus_handle_t i2c_bus, SemaphoreHandle_t lock) { // 
   ESP_LOGI(TAG, "Using preconfigured I2C bus and lock");
   bus_handle = i2c_bus;
   i2c_lock   = lock;
+  sccb_owns_i2c_port = false; // in this case, camera doesn't own the i2c port
 
   return ESP_OK;
 }
@@ -193,9 +193,8 @@ int SCCB_Deinit(void)
     return ESP_OK;
 }
 
-uint8_t SCCB_Probe(void)
+int SCCB_Probe(uint8_t slv_addr)
 {
-    uint8_t slave_addr = 0x0;
     esp_err_t ret;
 
     if (bus_handle == NULL) {
@@ -203,26 +202,14 @@ uint8_t SCCB_Probe(void)
       return ESP_FAIL;
     }
 
-    for (size_t i = 0; i < CAMERA_MODEL_MAX; i++)
+    ret = i2c_master_probe(bus_handle, slv_addr, TIMEOUT_MS);
+
+    if (ret == ESP_OK)
     {
-        if (slave_addr == camera_sensor[i].sccb_addr)
-        {
-            continue;
-        }
-        slave_addr = camera_sensor[i].sccb_addr;
-
-        ret = i2c_master_probe(bus_handle, slave_addr, TIMEOUT_MS);
-
-        if (ret == ESP_OK)
-        {
-            if (SCCB_Install_Device(slave_addr) != 0)
-            {
-                return 0;
-            }
-            return slave_addr;
-        }
+        return SCCB_Install_Device(slv_addr);
     }
-    return 0;
+
+    return ret;
 }
 
 uint8_t SCCB_Read(uint8_t slv_addr, uint8_t reg)
@@ -230,19 +217,24 @@ uint8_t SCCB_Read(uint8_t slv_addr, uint8_t reg)
     i2c_master_dev_handle_t dev_handle = *(get_handle_from_address(slv_addr));
 
     uint8_t tx_buffer[1];
-    uint8_t rx_buffer[1];
+    uint8_t rx_buffer[1] = {0};
 
     tx_buffer[0] = reg;
 
     i2cLock();
-    esp_err_t ret = i2c_master_transmit_receive(dev_handle, tx_buffer, 1, rx_buffer, 1, TIMEOUT_MS);
-    i2cUnlock();
-
-    if (ret != ESP_OK)
-    {
-        ESP_LOGE(TAG, "SCCB_Read Failed addr:0x%02x, reg:0x%02x, data:0x%02x, ret:%d", slv_addr, reg, rx_buffer[0], ret);
+    esp_err_t ret = i2c_master_transmit(dev_handle, tx_buffer, 1, TIMEOUT_MS);
+    if (ret != ESP_OK) {
+        i2cUnlock();
+        ESP_LOGE(TAG, "SCCB_Read addr phase failed addr:0x%02x, reg:0x%02x, ret:%d", slv_addr, reg, ret);
+        return 0;
     }
 
+    ret = i2c_master_receive(dev_handle, rx_buffer, 1, TIMEOUT_MS);
+    i2cUnlock();
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "SCCB_Read Failed addr:0x%02x, reg:0x%02x, ret:%d", slv_addr, reg, ret);
+    }
+    ESP_LOGD(TAG, "read OK");
     return rx_buffer[0];
 }
 
