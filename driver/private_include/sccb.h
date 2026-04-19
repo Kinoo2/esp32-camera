@@ -17,7 +17,7 @@
 int SCCB_Init(int pin_sda, int pin_scl);
 int SCCB_Use_Port(i2c_master_bus_handle_t i2c_bus, SemaphoreHandle_t lock);
 int SCCB_Deinit(void);
-uint8_t SCCB_Probe(void);
+int SCCB_Probe(uint8_t slv_addr);
 uint8_t SCCB_Read(uint8_t slv_addr, uint8_t reg);
 int SCCB_Write(uint8_t slv_addr, uint8_t reg, uint8_t data);
 uint8_t SCCB_Read16(uint8_t slv_addr, uint16_t reg);
