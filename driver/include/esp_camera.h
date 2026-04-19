@@ -79,6 +79,7 @@ typedef struct i2c_master_bus_t *i2c_master_bus_handle_t;
 #include "sys/time.h"
 
 #include <freertos/FreeRTOS.h>
+#include <freertos/semphr.h>
 
 /**
  * @brief define for if chip supports camera

@@ -16,6 +16,7 @@
 typedef struct i2c_master_bus_t *i2c_master_bus_handle_t;
 
 #include <freertos/FreeRTOS.h>
+#include <freertos/semphr.h>
 #include <freertos/task.h>
 #include <stdint.h>
 int SCCB_Init(int pin_sda, int pin_scl);
