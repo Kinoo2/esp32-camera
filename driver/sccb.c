@@ -87,19 +87,16 @@ int SCCB_Init(int pin_sda, int pin_scl)
     return i2c_driver_install(sccb_i2c_port, conf.mode, 0, 0, 0);
 }
 
-int SCCB_Use_Port(int i2c_num) { // sccb use an already initialized I2C port
-  if (_sccbLock == NULL) {
-    _sccbLock = xSemaphoreCreateMutex();
-  }
-    if (sccb_owns_i2c_port) {
-        SCCB_Deinit();
-    }
-    if (i2c_num < 0 || i2c_num > I2C_NUM_MAX) {
-        return ESP_ERR_INVALID_ARG;
-    }
-    sccb_i2c_port = i2c_num;
-    sccb_owns_i2c_port = false; // in this case, camera doesn't own the i2c port
-    return ESP_OK;
+int SCCB_Use_Port(i2c_master_bus_handle_t i2c_bus, SemaphoreHandle_t lock) {
+    // The preconfigured-bus + semaphore-lock form of SCCB_Use_Port requires
+    // the new-driver types from driver/i2c_master.h (esp_driver_i2c, IDF 5.2+).
+    // This legacy sccb.c is compiled only on IDF versions without the new
+    // driver, so the entry point cannot be backed by real functionality here.
+    // The signature is preserved to match sccb.h (shared with sccb-ng.c on
+    // IDF 5.2+); callers on legacy IDF get a runtime not-supported error.
+    (void)i2c_bus;
+    (void)lock;
+    return ESP_ERR_NOT_SUPPORTED;
 }
 
 int SCCB_Deinit(void)

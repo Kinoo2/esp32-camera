@@ -8,10 +8,15 @@
  */
 #ifndef __SCCB_H__
 #define __SCCB_H__
-#include "driver/i2c_master.h"
-#include "driver/i2c_types.h"
+/* Forward declaration of i2c_master_bus_handle_t from driver/i2c_master.h.
+   Declared locally rather than pulling in the full header so this public
+   interface compiles on IDF 5.1 (header absent) and IDF 6.0+ (header
+   relocated to the esp_driver_i2c component). Implementations that need
+   the full type (e.g. sccb-ng.c) include driver/i2c_master.h themselves. */
+typedef struct i2c_master_bus_t *i2c_master_bus_handle_t;
 
 #include <freertos/FreeRTOS.h>
+#include <freertos/semphr.h>
 #include <freertos/task.h>
 #include <stdint.h>
 int SCCB_Init(int pin_sda, int pin_scl);
