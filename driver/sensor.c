@@ -37,8 +37,10 @@ const resolution_info_t resolution[FRAMESIZE_INVALID] = {
     {  480,  320, ASPECT_RATIO_3X2   }, /* HVGA  */
     {  480,  480, ASPECT_RATIO_1X1   }, /* 480x480 */
     {  640,  480, ASPECT_RATIO_4X3   }, /* VGA   */
+    {  640,  640, ASPECT_RATIO_1X1   }, /* 640x640 */
     {  800,  600, ASPECT_RATIO_4X3   }, /* SVGA  */
     { 1024,  768, ASPECT_RATIO_4X3   }, /* XGA   */
+    { 1024, 1024, ASPECT_RATIO_1X1   }, /* 1024x1024 */
     { 1280,  720, ASPECT_RATIO_16X9  }, /* HD    */
     { 1280, 1024, ASPECT_RATIO_5X4   }, /* SXGA  */
     { 1600, 1200, ASPECT_RATIO_4X3   }, /* UXGA  */
