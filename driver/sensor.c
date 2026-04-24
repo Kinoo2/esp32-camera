@@ -43,9 +43,12 @@ const resolution_info_t resolution[FRAMESIZE_INVALID] = {
     { 1024, 1024, ASPECT_RATIO_1X1   }, /* 1024x1024 */
     { 1280,  720, ASPECT_RATIO_16X9  }, /* HD    */
     { 1280, 1024, ASPECT_RATIO_5X4   }, /* SXGA  */
+    { 1280, 1280, ASPECT_RATIO_1X1   }, /* 1280x1280 */
+    { 1536, 1536, ASPECT_RATIO_1X1   }, /* 1536x1536 */
     { 1600, 1200, ASPECT_RATIO_4X3   }, /* UXGA  */
     // 3MP Sensors
     { 1920, 1080, ASPECT_RATIO_16X9  }, /* FHD   */
+    { 1920, 1920, ASPECT_RATIO_1X1   }, /* 1920x1920 */
     {  720, 1280, ASPECT_RATIO_9X16  }, /* Portrait HD   */
     {  864, 1536, ASPECT_RATIO_9X16  }, /* Portrait 3MP   */
     { 2048, 1536, ASPECT_RATIO_4X3   }, /* QXGA  */
